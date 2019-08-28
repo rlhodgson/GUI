@@ -1,7 +1,7 @@
 """DOC Form, takes user input through GUI and enters it into a database table
    Author: Rachel Hodgson
    Start Date: 30-05-2019
-   Completion Date: 28-06-2019
+   Completion Date: 28-08-2019
 """
 
 from tkinter import * 
@@ -50,15 +50,14 @@ class DocForm(): #form class
         #combobox with list of conditions 
         #when selected the 'addcond' function is called to add that condition
         
-        
         self.diffbut = Label(window, text="Please select a difficulty 1 - 10")
         self.diffbut.grid(row=4, column=0, columnspan=2, padx=5, pady=5)    
         #label for difficulty entry
           
-           
-        self.difficulty = Entry(window, width=14)
+        diffis = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]           
+        self.difficulty = Combobox(window, values=diffis, width=6)
         self.difficulty.grid(row=4, column=2, padx=5)
-        self.difficulty.bind('<KeyRelease>', self.getdifficulty)
+        self.difficulty.bind('<<ComboboxSelected>>', self.getdifficulty) 
         #when the user finishes their entry the 'getdifficulty' function is called
         
         
@@ -68,7 +67,7 @@ class DocForm(): #form class
         
         
         self.final = Label(window, text='')
-        self.final.grid(row=7, column=1)
+        self.final.grid(row=7, column=0, columnspan=3)
         #label to say 'completed' when the process is finished
         
    
@@ -133,7 +132,20 @@ class DocForm(): #form class
         with sqlite3.connect("db/tracks.db") as db: #opening correct database
             cursor = db.cursor()
             cursor.execute("INSERT INTO Tracks(TrackName,Difficulty,Conditions,Date) VALUES (?,?,?,?)",newrecord) #inserts the information into the correct columns of the database
-            db.commit()        
+            db.commit() 
+            cursor.execute("SELECT * FROM Tracks")
+            rows = cursor.fetchall()    
+            
+        w, n, d, c, da = rows[-1]
+        
+        listss = []
+        listss.append(str(n))
+        listss.append(str(d))
+        listss.append(str(c))
+        listss.append(str(da))
+        stringfinal = ', '.join(listss)        
+            
+        self.final['text'] = "Latest submission: " + stringfinal
 
         
 def main():
